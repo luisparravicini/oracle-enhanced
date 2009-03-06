@@ -131,12 +131,11 @@ begin
         end
 
         # convert something to a boolean
-        # RSI: added y as boolean value
         def self.value_to_boolean(value)
           if value == true || value == false
             value
           else
-            %w(true t 1 y +).include?(value.to_s.downcase)
+            %w(true t 1 OracleEnhancedAdapter.boolean_values[true] +).include?(value.to_s.downcase)
           end
         end
 
@@ -254,6 +253,11 @@ begin
         @@emulate_dates = false
         cattr_accessor :emulate_dates
 
+        @@boolean_values = { true => 'Y', false => 'N' }
+        def self.boolean_values(values)
+          @@boolean_values.merge! values
+        end
+
         # RSI: set to true if columns with DATE in their name should be emulated as date
         @@emulate_dates_by_column_name = false
         cattr_accessor :emulate_dates_by_column_name
@@ -288,7 +292,7 @@ begin
           field_type =~ /^VARCHAR2/ && (name =~ /_flag$/i || name =~ /_yn$/i)
         end
         def self.boolean_to_string(bool)
-          bool ? "Y" : "N"
+          @@boolean_values[bool]
         end
 
         # RSI: use to set NLS specific date formats which will be used when assigning string to :date and :datetime columns
